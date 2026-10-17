@@ -214,7 +214,7 @@
         <main>
 
 <h1>Accessible Timeline</h1>
-<p class="meta">Cliente inclusivo de redes sociais produzido por <strong>Tech Tales Entertainment</strong> | <strong>Versão:</strong> 0.3.0<br/>
+<p class="meta">Cliente inclusivo de redes sociais produzido por <strong>Tech Tales Entertainment</strong> | <strong>Versão:</strong> 0.4.0<br/>
 Site oficial: <a href="https://www.techtales.com.br" target="_blank" rel="noopener noreferrer">https://www.techtales.com.br</a></p>
 
 <section>
@@ -226,11 +226,14 @@ Site oficial: <a href="https://www.techtales.com.br" target="_blank" rel="noopen
 <section>
 <h2>Recursos Principais</h2>
 <ul>
-<li><strong>Árvore de Fluxos Clássica</strong>: Navegue com agilidade entre as seções <em>Para você</em>, <em>Seguindo</em>, <em>Menções (Notificações)</em> e <em>Mensagens diretas</em>.</li>
-<li><strong>Leitura Linear em Ordem Cronológica Reversa</strong>: As publicações mais recentes aparecem no topo da lista com cálculo de tempo relativo no estilo TWBlue (ex.: <em>2 horas atrás</em>, <em>3 semanas atrás</em>).</li>
-<li><strong>Composição Completa de Conteúdo</strong>: Crie novas publicações com <kbd>Ctrl+N</kbd>, responda a postagens com <kbd>Ctrl+R</kbd>, reposte ou cite com <kbd>Ctrl+Shift+R</kbd> e envie DMs com <kbd>Ctrl+D</kbd>.</li>
-<li><strong>Interação Imediata</strong>: Curta publicações com <kbd>Ctrl+L</kbd> com resposta sonora instantânea.</li>
-<li><strong>Leitura Detalhada e Links</strong>: Abra os detalhes da publicação com <kbd>Enter</kbd> e acesse links externos com <kbd>Ctrl+O</kbd>.</li>
+<li><strong>Árvore de Fluxos Clássica e Buffers Dinâmicos</strong>: Navegue entre <em>Para você</em>, <em>Seguindo</em>, <em>Menções</em>, <em>Mensagens diretas</em>, o novo fluxo de <em>Enviados</em> e abra a timeline de qualquer perfil do X (<kbd>Ctrl+U</kbd> ou <kbd>Ctrl+Alt+U</kbd>) em novos buffers independentes.</li>
+<li><strong>Leitura Linear em Ordem Cronológica Reversa</strong>: As publicações mais recentes aparecem no topo da lista com anúncio de data e hora imediatamente após o texto do post (estilo TWBlue: <kbd>Autor: post, tanto tempo atrás</kbd>).</li>
+<li><strong>Gestão Social de Perfis</strong>: Busque perfis por nome ou @username com <kbd>Ctrl+Shift+U</kbd>, siga autores com <kbd>Ctrl+Shift+F</kbd>, deixe de seguir com <kbd>Ctrl+Alt+F</kbd> e bloqueie com <kbd>Ctrl+Shift+B</kbd>.</li>
+<li><strong>Modo em Segundo Plano e Atalhos Globais</strong>: Oculte a janela com <kbd>Ctrl+Win+H</kbd> e continue navegando, lendo posts, curtindo ou compondo publicações a partir de qualquer aplicativo do Windows.</li>
+<li><strong>Integração Direta com NVDA</strong>: Conexão nativa com a DLL do NVDA e <kbd>accessible_output2</kbd> para alertas sonoros e leitura de status sem roubar foco.</li>
+<li><strong>Filtro Nativo de Anúncios</strong>: Bloqueio transparente de posts patrocinados e rotas de telemetria/publicidade.</li>
+<li><strong>Composição Completa de Conteúdo</strong>: Crie novos posts com <kbd>Ctrl+N</kbd>, responda com <kbd>Ctrl+R</kbd>, reposte ou cite com <kbd>Ctrl+Shift+R</kbd> e envie DMs com <kbd>Ctrl+D</kbd>.</li>
+<li><strong>Customização Completa de Preferências (<kbd>Ctrl+P</kbd>)</strong>: Ajuste formato do autor, posicionamento da data/hora, métricas no resumo, temas sonoros e visualização de atalhos em abas acessíveis.</li>
 <li><strong>Download e Atualizações Automáticas In-Place</strong>: O aplicativo verifica atualizações ao iniciar e baixa e instala novos pacotes automaticamente no programa.</li>
 <li><strong>Navegador Embutido Isolado</strong>: Motor Chromium dedicado em segundo plano que preserva seus cookies e sessão sem abrir janelas desnecessárias.</li>
 </ul>
@@ -254,15 +257,11 @@ Site oficial: <a href="https://www.techtales.com.br" target="_blank" rel="noopen
     </tr>
     <tr>
       <td><kbd>Setas Cima</kbd> / <kbd>Baixo</kbd> (na Árvore)</td>
-      <td>Navega entre as seções: Para você, Seguindo, Menções e Mensagens diretas</td>
+      <td>Navega entre as seções: Para você, Seguindo, Menções, DMs, Enviados e buffers de usuários</td>
     </tr>
     <tr>
       <td><kbd>Setas Direita</kbd> / <kbd>Esquerda</kbd> (na Árvore)</td>
       <td>Expande ou recolhe o nó principal da conta</td>
-    </tr>
-    <tr>
-      <td><kbd>Ctrl+Win+Seta Cima</kbd> / <kbd>Baixo</kbd></td>
-      <td>Alterna entre os fluxos de qualquer lugar do aplicativo</td>
     </tr>
     <tr>
       <td><kbd>Setas Cima</kbd> / <kbd>Baixo</kbd> (na Lista)</td>
@@ -286,19 +285,47 @@ Site oficial: <a href="https://www.techtales.com.br" target="_blank" rel="noopen
     </tr>
     <tr>
       <td><kbd>Ctrl+L</kbd></td>
-      <td>Curtir a publicação selecionada</td>
+      <td>Curtir / descurtir a publicação selecionada</td>
     </tr>
     <tr>
       <td><kbd>Ctrl+D</kbd></td>
       <td>Enviar mensagem direta (DM)</td>
     </tr>
     <tr>
-      <td><kbd>Ctrl+O</kbd></td>
+      <td><kbd>Ctrl+O</kbd> / <kbd>Ctrl+Enter</kbd></td>
       <td>Abrir links contidos na publicação</td>
     </tr>
     <tr>
+      <td><kbd>Ctrl+U</kbd></td>
+      <td>Abrir linha do tempo de um usuário em novo buffer</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Alt+U</kbd></td>
+      <td>Abrir linha do tempo do autor da publicação selecionada em novo buffer</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+W</kbd></td>
+      <td>Fechar o buffer de usuário ativo na árvore</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Shift+U</kbd></td>
+      <td>Buscar perfis de usuários do X por nome ou @username</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Shift+F</kbd></td>
+      <td>Seguir o autor da publicação selecionada</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Alt+F</kbd></td>
+      <td>Deixar de seguir o autor da publicação selecionada</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Shift+B</kbd></td>
+      <td>Bloquear o autor da publicação selecionada</td>
+    </tr>
+    <tr>
       <td><kbd>Ctrl+P</kbd></td>
-      <td>Abrir configurações do aplicativo (verificação automática, etc.)</td>
+      <td>Abrir configurações do aplicativo (Geral, Leitura, Áudio e Atalhos)</td>
     </tr>
     <tr>
       <td><kbd>F5</kbd></td>
@@ -315,6 +342,56 @@ Site oficial: <a href="https://www.techtales.com.br" target="_blank" rel="noopen
     <tr>
       <td><kbd>Alt+F4</kbd></td>
       <td>Encerra o aplicativo de forma limpa</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="mt-4">Atalhos Globais do Windows (Operação em Segundo Plano)</h3>
+<p>Opere o Accessible Timeline a partir de qualquer outro programa sem precisar trazer a janela para o primeiro plano:</p>
+
+<table class="table-accessible" role="table" aria-label="Tabela de atalhos globais de segundo plano">
+  <thead>
+    <tr>
+      <th scope="col">Atalho Global</th>
+      <th scope="col">Ação em Segundo Plano</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><kbd>Ctrl+Win+H</kbd></td>
+      <td>Ocultar ou restaurar a janela do aplicativo com anúncio por voz</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Win+Seta Baixo</kbd></td>
+      <td>Ler a próxima publicação do fluxo ativo via sintetizador de fala</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Win+Seta Cima</kbd></td>
+      <td>Ler a publicação anterior do fluxo ativo via sintetizador de fala</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Alt+Win+Seta Direita</kbd></td>
+      <td>Alternar para o próximo fluxo (Para você, Seguindo, Menções, DMs, Enviados)</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Alt+Win+Seta Esquerda</kbd></td>
+      <td>Alternar para o fluxo anterior</td>
+    </tr>
+    <tr>
+      <td><kbd>Alt+Win+N</kbd></td>
+      <td>Abrir diálogo para compor nova publicação a partir de qualquer aplicativo</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Win+R</kbd></td>
+      <td>Responder à publicação selecionada em segundo plano</td>
+    </tr>
+    <tr>
+      <td><kbd>Alt+Win+L</kbd></td>
+      <td>Curtir / descurtir a publicação ativa em segundo plano</td>
+    </tr>
+    <tr>
+      <td><kbd>Alt+Win+C</kbd></td>
+      <td>Copiar o texto da publicação ativa diretamente para a área de transferência</td>
     </tr>
   </tbody>
 </table>
@@ -340,7 +417,7 @@ Dúvidas, sugestões e suporte: <a href="https://www.techtales.com.br" target="_
         <main>
 
 <h1>Accessible Timeline</h1>
-<p class="meta">An inclusive social media client produced by <strong>Tech Tales Entertainment</strong> | <strong>Version:</strong> 0.3.0<br/>
+<p class="meta">An inclusive social media client produced by <strong>Tech Tales Entertainment</strong> | <strong>Version:</strong> 0.4.0<br/>
 Official website: <a href="https://www.techtales.com.br" target="_blank" rel="noopener noreferrer">https://www.techtales.com.br</a></p>
 
 <section>
@@ -352,11 +429,14 @@ Official website: <a href="https://www.techtales.com.br" target="_blank" rel="no
 <section>
 <h2>Key Features</h2>
 <ul>
-<li><strong>Classic Stream Tree</strong>: Quickly toggle between <em>For You</em>, <em>Following</em>, <em>Mentions (Notifications)</em>, and <em>Direct Messages</em>.</li>
-<li><strong>Reverse-Chronological Timeline</strong>: Recent posts appear at the top with TWBlue-style relative timestamps (e.g. <em>2 hours ago</em>, <em>3 weeks ago</em>).</li>
+<li><strong>Classic Stream Tree & Dynamic Buffers</strong>: Quickly toggle between <em>For You</em>, <em>Following</em>, <em>Mentions</em>, <em>Direct Messages</em>, the new permanent <em>Sent</em> buffer, and open any X profile's timeline (<kbd>Ctrl+U</kbd> or <kbd>Ctrl+Alt+U</kbd>) in dedicated independent buffers.</li>
+<li><strong>Reverse-Chronological Timeline</strong>: Recent posts appear at the top with TWBlue-style timestamps placed after the post text (<kbd>Author: post text, time ago</kbd>).</li>
+<li><strong>Comprehensive Profile Management</strong>: Search profiles with <kbd>Ctrl+Shift+U</kbd>, follow authors with <kbd>Ctrl+Shift+F</kbd>, unfollow with <kbd>Ctrl+Alt+F</kbd>, and block with <kbd>Ctrl+Shift+B</kbd>.</li>
+<li><strong>Background Mode & Global Hotkeys</strong>: Hide the window with <kbd>Ctrl+Win+H</kbd> and navigate, read, like, or compose tweets directly from any running Windows app.</li>
+<li><strong>Direct NVDA Speech Integration</strong>: Native connection to the NVDA controller DLL and <kbd>accessible_output2</kbd> for live status bar and mention announcements without focus stealing.</li>
+<li><strong>Native Ad & Telemetry Blocking</strong>: Automatic suppression of sponsored posts and blocking of ad networks in the embedded browser engine.</li>
 <li><strong>Full Authoring Suite</strong>: Compose new posts with <kbd>Ctrl+N</kbd>, reply with <kbd>Ctrl+R</kbd>, repost or quote with <kbd>Ctrl+Shift+R</kbd>, and send DMs with <kbd>Ctrl+D</kbd>.</li>
-<li><strong>Quick Actions</strong>: Like posts instantly with <kbd>Ctrl+L</kbd> and real-time audio confirmation.</li>
-<li><strong>Full Post Inspector & Links</strong>: Read complete posts with <kbd>Enter</kbd> and open attached links with <kbd>Ctrl+O</kbd>.</li>
+<li><strong>Rich Tabbed Preferences (<kbd>Ctrl+P</kbd>)</strong>: Customize author name formats, timestamp position, metric summaries, and audio sound themes.</li>
 <li><strong>In-Place Auto-Updater</strong>: Checks for releases on startup, downloads packages in-app, and replaces files automatically.</li>
 <li><strong>Embedded Isolated Browser</strong>: Dedicated background Chromium engine keeping your credentials and cookies completely private.</li>
 </ul>
@@ -380,15 +460,11 @@ Official website: <a href="https://www.techtales.com.br" target="_blank" rel="no
     </tr>
     <tr>
       <td><kbd>Up</kbd> / <kbd>Down Arrows</kbd> (in Tree)</td>
-      <td>Navigate streams: For you, Following, Mentions, and Direct messages</td>
+      <td>Navigate streams: For you, Following, Mentions, DMs, Sent, and custom user buffers</td>
     </tr>
     <tr>
       <td><kbd>Right</kbd> / <kbd>Left Arrows</kbd> (in Tree)</td>
       <td>Expand or collapse the account root node</td>
-    </tr>
-    <tr>
-      <td><kbd>Ctrl+Win+Up</kbd> / <kbd>Down Arrows</kbd></td>
-      <td>Switch streams from anywhere in the application</td>
     </tr>
     <tr>
       <td><kbd>Up</kbd> / <kbd>Down Arrows</kbd> (in List)</td>
@@ -412,19 +488,47 @@ Official website: <a href="https://www.techtales.com.br" target="_blank" rel="no
     </tr>
     <tr>
       <td><kbd>Ctrl+L</kbd></td>
-      <td>Like the selected post</td>
+      <td>Like / unlike the selected post</td>
     </tr>
     <tr>
       <td><kbd>Ctrl+D</kbd></td>
       <td>Send a direct message (DM)</td>
     </tr>
     <tr>
-      <td><kbd>Ctrl+O</kbd></td>
+      <td><kbd>Ctrl+O</kbd> / <kbd>Ctrl+Enter</kbd></td>
       <td>Open links attached to the post</td>
     </tr>
     <tr>
+      <td><kbd>Ctrl+U</kbd></td>
+      <td>Open a user's timeline in a new buffer</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Alt+U</kbd></td>
+      <td>Open the selected post author's timeline in a new buffer</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+W</kbd></td>
+      <td>Close the active user timeline buffer</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Shift+U</kbd></td>
+      <td>Search X user profiles by name or @username</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Shift+F</kbd></td>
+      <td>Follow the author of the selected post</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Alt+F</kbd></td>
+      <td>Unfollow the author of the selected post</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Shift+B</kbd></td>
+      <td>Block the author of the selected post</td>
+    </tr>
+    <tr>
       <td><kbd>Ctrl+P</kbd></td>
-      <td>Open Settings (automatic updates toggle, etc.)</td>
+      <td>Open Settings (General, Reading, Audio, and Shortcuts tabs)</td>
     </tr>
     <tr>
       <td><kbd>F5</kbd></td>
@@ -441,6 +545,56 @@ Official website: <a href="https://www.techtales.com.br" target="_blank" rel="no
     <tr>
       <td><kbd>Alt+F4</kbd></td>
       <td>Exit the application cleanly</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 class="mt-4">System-Wide Global Hotkeys (Background Mode)</h3>
+<p>Operate Accessible Timeline from any other program without having to switch focus back to the window:</p>
+
+<table class="table-accessible" role="table" aria-label="Global hotkeys table">
+  <thead>
+    <tr>
+      <th scope="col">Global Shortcut</th>
+      <th scope="col">Background Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><kbd>Ctrl+Win+H</kbd></td>
+      <td>Hide or restore the application window with speech notification</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Win+Down Arrow</kbd></td>
+      <td>Read the next post in the active stream via screen reader speech</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Win+Up Arrow</kbd></td>
+      <td>Read the previous post in the active stream via screen reader speech</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Alt+Win+Right Arrow</kbd></td>
+      <td>Switch to the next stream (For you, Following, Mentions, DMs, Sent)</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Alt+Win+Left Arrow</kbd></td>
+      <td>Switch to the previous stream</td>
+    </tr>
+    <tr>
+      <td><kbd>Alt+Win+N</kbd></td>
+      <td>Open the tweet composer dialog from any desktop application</td>
+    </tr>
+    <tr>
+      <td><kbd>Ctrl+Win+R</kbd></td>
+      <td>Reply to the selected post in the background</td>
+    </tr>
+    <tr>
+      <td><kbd>Alt+Win+L</kbd></td>
+      <td>Like / unlike the active post in the background</td>
+    </tr>
+    <tr>
+      <td><kbd>Alt+Win+C</kbd></td>
+      <td>Copy active post text directly to the system clipboard</td>
     </tr>
   </tbody>
 </table>

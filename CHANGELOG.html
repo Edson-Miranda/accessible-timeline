@@ -193,6 +193,36 @@ Site oficial: <a href="https://www.techtales.com.br" target="_blank" rel="noopen
 
 <section>
 <div>
+  <span class="version-tag">Versão 0.4.0</span>
+  <span class="version-date">17 de Outubro de 2026</span>
+</div>
+<h2>Buffers Dinâmicos de Usuários, Gestão de Perfis, Modo Segundo Plano, Fala Direta NVDA e Filtro de Anúncios</h2>
+<ul>
+  <li><strong>Buffers Dinâmicos para Linhas do Tempo de Usuários (<kbd>Ctrl+U</kbd> / <kbd>Ctrl+Alt+U</kbd>)</strong>: Abra a linha do tempo de qualquer usuário do X em uma aba dedicada na árvore de fluxos, com navegação, sincronização e paginação independentes. Feche o buffer ativo a qualquer momento com <kbd>Ctrl+W</kbd>.</li>
+  <li><strong>Gestão Completa de Usuários (<kbd>Ctrl+Shift+U</kbd>)</strong>: Novo diálogo para buscar usuários por nome ou @username, inspecionar perfis, seguir (<kbd>Ctrl+Shift+F</kbd>), deixar de seguir (<kbd>Ctrl+Alt+F</kbd>) e bloquear (<kbd>Ctrl+Shift+B</kbd>).</li>
+  <li><strong>Fluxo Permanente de Enviados</strong>: Novo buffer nativo <em>Enviados</em> na árvore de fluxos contendo todas as suas postagens e respostas publicadas na conta.</li>
+  <li><strong>Modo em Segundo Plano e Atalhos Globais do Windows</strong>:
+    <ul>
+      <li><kbd>Ctrl+Win+H</kbd>: Ocultar e restaurar a janela do aplicativo de qualquer lugar com anúncio sonoro e vocal.</li>
+      <li><kbd>Ctrl+Win+Seta Abaixo</kbd> / <kbd>Ctrl+Win+Seta Acima</kbd>: Ler próxima ou anterior publicação em segundo plano com fala direta.</li>
+      <li><kbd>Ctrl+Alt+Win+Seta Direita</kbd> / <kbd>Ctrl+Alt+Win+Seta Esquerda</kbd>: Alternar entre fluxos em segundo plano.</li>
+      <li><kbd>Alt+Win+N</kbd>: Compor nova publicação a partir de qualquer aplicativo.</li>
+      <li><kbd>Ctrl+Win+R</kbd>: Responder à publicação ativa em segundo plano.</li>
+      <li><kbd>Alt+Win+L</kbd>: Curtir publicação ativa em segundo plano.</li>
+      <li><kbd>Alt+Win+C</kbd>: Copiar texto da publicação ativa diretamente para a área de transferência.</li>
+      <li>Ícone na Área de Notificação (SysTray) com suporte a minimizar ao fechar.</li>
+    </ul>
+  </li>
+  <li><strong>Integração de Fala Direta para NVDA e Leitores de Tela</strong>: Suporte nativo ao controlador do NVDA (<kbd>nvdaControllerClient64.dll</kbd>) e <kbd>accessible_output2</kbd>, com anúncio vocal automático de status e menções recebidas sem roubar foco.</li>
+  <li><strong>Filtro Nativo de Anúncios e Conteúdo Patrocinado</strong>: Bloqueio automático de tweets patrocinados no parsing e interceptação de rotas de telemetria/publicidade no navegador embutido.</li>
+  <li><strong>Leitura de Data e Hora Após o Texto (Estilo TWBlue)</strong>: As postagens agora anunciam a data/hora imediatamente após o conteúdo (<kbd>Autor: post, tanto tempo atrás</kbd>), eliminando ruídos no início da leitura.</li>
+  <li><strong>Customização Completa de Exibição e Áudio (<kbd>Ctrl+P</kbd>)</strong>: Novo diálogo de configurações com abas para customizar formato do autor (nome e arroba), exibição e posição da data/hora, métricas de curtidas/reposts e temas sonoros.</li>
+  <li><strong>Navegação Acessível Refinada</strong>: Rótulos nativos limpos na árvore (<kbd>Fluxos</kbd>) e na lista (<kbd>Publicações</kbd>), eliminando textos estáticos verbosos para os leitores de tela.</li>
+</ul>
+</section>
+
+<section>
+<div>
   <span class="version-tag">Versão 0.3.0</span>
   <span class="version-date">16 de Outubro de 2026</span>
 </div>
@@ -262,6 +292,36 @@ Site oficial: <a href="https://www.techtales.com.br" target="_blank" rel="noopen
 <h1>Version History</h1>
 <p class="meta">Release notes and change history for Accessible Timeline by <strong>Tech Tales Entertainment</strong>.<br/>
 Official website: <a href="https://www.techtales.com.br" target="_blank" rel="noopener noreferrer">https://www.techtales.com.br</a></p>
+
+<section>
+<div>
+  <span class="version-tag">Version 0.4.0</span>
+  <span class="version-date">October 17, 2026</span>
+</div>
+<h2>Dynamic User Buffers, Social Management, Background Mode, Direct NVDA Speech, and Ad Filtering</h2>
+<ul>
+  <li><strong>Dynamic User Timeline Buffers (<kbd>Ctrl+U</kbd> / <kbd>Ctrl+Alt+U</kbd>)</strong>: Open any user profile's timeline into an independent buffer in the stream tree with full navigation and paging. Close the active user buffer at any time using <kbd>Ctrl+W</kbd>.</li>
+  <li><strong>Comprehensive User Management (<kbd>Ctrl+Shift+U</kbd>)</strong>: Search users by name or @username, view profile bios, follow (<kbd>Ctrl+Shift+F</kbd>), unfollow (<kbd>Ctrl+Alt+F</kbd>), and block profiles (<kbd>Ctrl+Shift+B</kbd>).</li>
+  <li><strong>Permanent Sent Stream</strong>: New dedicated <em>Sent</em> buffer in the account tree listing all your authored posts and replies.</li>
+  <li><strong>Background Mode & System-Wide Global Hotkeys</strong>:
+    <ul>
+      <li><kbd>Ctrl+Win+H</kbd>: Hide or bring back the application window from anywhere with speech announcement.</li>
+      <li><kbd>Ctrl+Win+Down</kbd> / <kbd>Ctrl+Win+Up</kbd>: Read next or previous post in the background using direct speech.</li>
+      <li><kbd>Ctrl+Alt+Win+Right</kbd> / <kbd>Ctrl+Alt+Win+Left</kbd>: Switch streams in the background.</li>
+      <li><kbd>Alt+Win+N</kbd>: Compose a new post from any desktop application.</li>
+      <li><kbd>Ctrl+Win+R</kbd>: Reply to the current post in the background.</li>
+      <li><kbd>Alt+Win+L</kbd>: Like the active post in the background.</li>
+      <li><kbd>Alt+Win+C</kbd>: Copy current post text directly to the clipboard.</li>
+      <li>Accessible System Tray icon with minimize-to-tray capability.</li>
+    </ul>
+  </li>
+  <li><strong>Direct Speech Integration for NVDA & Screen Readers</strong>: Native controller integration (<kbd>nvdaControllerClient64.dll</kbd>) and <kbd>accessible_output2</kbd> delivering automatic status announcements and instant mention alerts without focus theft.</li>
+  <li><strong>Native Ad & Telemetry Filter</strong>: Seamless elimination of sponsored tweets and blocking of ad tracking networks in the embedded browser engine.</li>
+  <li><strong>TWBlue-Style Post Reading with Timestamps After Text</strong>: Screen readers announce posts with elapsed time placed after the tweet text (<kbd>Author: post text, time ago</kbd>).</li>
+  <li><strong>Rich Customization in Settings (<kbd>Ctrl+P</kbd>)</strong>: Tabbed preferences dialog to customize author name display, timestamp format and positioning, metric announcements, and sound themes.</li>
+  <li><strong>Streamlined Accessible UI</strong>: Clean Win32 accessible names for tree (<kbd>Fluxos</kbd>) and list (<kbd>Publicações</kbd>), removing verbose helper static labels.</li>
+</ul>
+</section>
 
 <section>
 <div>
