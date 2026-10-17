@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime
+from datetime import datetime, timedelta
 from src.core.models import User, Post, MediaItem
 from src.core.config import config_manager, DEFAULT_SHORTCUTS, DEFAULT_GLOBAL_SHORTCUTS
 from src.ui.main_window import parse_shortcut_to_wx
@@ -52,8 +52,27 @@ class TestUserModelAndFormatting(unittest.TestCase):
             text="Testando data",
             created_at_str="2026-10-17 14:00:00"
         )
+        # Padrão: data/hora após o texto do post (estilo: edson: post, tanto tempo atrás)
         summary = post.to_accessible_summary(time_format="absolute")
-        self.assertIn("Carlos (@carlos), 2026-10-17 14:00:00: Testando data", summary)
+        self.assertEqual("Carlos (@carlos): Testando data, 2026-10-17 14:00:00", summary)
+
+        # Configuração alternativa: antes do texto do post
+        summary_before = post.to_accessible_summary(time_format="absolute", time_position="before_text")
+        self.assertEqual("Carlos (@carlos), 2026-10-17 14:00:00: Testando data", summary_before)
+
+        # Teste com tempo relativo
+        now = datetime.now()
+        dt_5m = now - timedelta(minutes=5)
+        post_rel = Post(
+            id="889",
+            platform="x_twitter",
+            author_name="Edson",
+            author_username="edson",
+            text="Olá mundo!",
+            created_at=dt_5m
+        )
+        summary_rel = post_rel.to_accessible_summary(time_format="relative", show_metrics=False)
+        self.assertEqual("Edson (@edson): Olá mundo!, 5 minutos atrás", summary_rel)
 
     def test_parse_shortcut_to_wx(self):
         self.assertIsNotNone(parse_shortcut_to_wx("Ctrl+N"))

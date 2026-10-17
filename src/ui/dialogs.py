@@ -679,6 +679,21 @@ class SettingsDialog(wx.Dialog):
         self.combo_time.SetSelection(t_idx)
         disp_sizer.Add(self.combo_time, 0, wx.EXPAND | wx.ALL, 10)
 
+        disp_sizer.Add(wx.StaticText(display_panel, label="&Posição da data e hora:"), 0, wx.LEFT | wx.RIGHT | wx.TOP, 10)
+        self.time_pos_choices = [
+            ("after_text", "Após o texto da publicação (Padrão) - Ex: Autor: Post, 2 horas atrás"),
+            ("before_text", "Antes do texto da publicação - Ex: Autor, 2 horas atrás: Post"),
+        ]
+        self.combo_time_pos = wx.ComboBox(
+            display_panel,
+            choices=[label for _, label in self.time_pos_choices],
+            style=wx.CB_DROPDOWN | wx.CB_READONLY
+        )
+        curr_time_pos = config_manager.get("time_position", "after_text")
+        tp_idx = next((i for i, (k, _) in enumerate(self.time_pos_choices) if k == curr_time_pos), 0)
+        self.combo_time_pos.SetSelection(tp_idx)
+        disp_sizer.Add(self.combo_time_pos, 0, wx.EXPAND | wx.ALL, 10)
+
         self.chk_metrics = wx.CheckBox(
             display_panel,
             label="Anunciar &curtidas, reposts e respostas no resumo ao navegar com setas"
@@ -826,6 +841,9 @@ class SettingsDialog(wx.Dialog):
 
         time_k = self.time_choices[self.combo_time.GetSelection()][0]
         config_manager.set("time_display_format", time_k, auto_save=False)
+
+        time_pos_k = self.time_pos_choices[self.combo_time_pos.GetSelection()][0]
+        config_manager.set("time_position", time_pos_k, auto_save=False)
 
         config_manager.set("show_metrics_in_summary", self.chk_metrics.GetValue(), auto_save=False)
         config_manager.set("speak_status_alerts", self.chk_speak_status.GetValue(), auto_save=False)

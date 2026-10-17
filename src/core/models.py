@@ -177,7 +177,8 @@ class Post:
         self,
         author_format: Optional[str] = None,
         time_format: Optional[str] = None,
-        show_metrics: Optional[bool] = None
+        show_metrics: Optional[bool] = None,
+        time_position: Optional[str] = None
     ) -> str:
         """
         Retorna o texto da publicação para anúncio natural na lista pelo leitor de tela.
@@ -189,6 +190,8 @@ class Post:
             time_format = config_manager.get("time_display_format", "relative")
         if show_metrics is None:
             show_metrics = config_manager.get("show_metrics_in_summary", True)
+        if time_position is None:
+            time_position = config_manager.get("time_position", "after_text")
 
         # Formatação do autor
         if author_format == "name_only":
@@ -236,7 +239,14 @@ class Post:
             if metrics:
                 metrics_part = f" • {', '.join(metrics)}"
 
-        return f"{prefix}{author_str}{time_part}: {clean_text}{metrics_part}"
+        if time_position == "before_text":
+            return f"{prefix}{author_str}{time_part}: {clean_text}{metrics_part}"
+        else:  # after_text (padrão): autor: texto, tempo
+            if clean_text:
+                body = f"{clean_text}{time_part}"
+            else:
+                body = time_str
+            return f"{prefix}{author_str}: {body}{metrics_part}"
 
     def to_accessible_full(self) -> str:
         """

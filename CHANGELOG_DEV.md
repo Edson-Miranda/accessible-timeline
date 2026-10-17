@@ -1,3 +1,18 @@
+## [0.1.0-dev.23] - 2026-10-17
+
+### Modificado
+- **Posicionamento de Data e Hora no Resumo Acessível de Publicações (`src/core/models.py`, `src/core/config.py`, `src/ui/dialogs.py`)**:
+  - Reestruturação da leitura acessível de publicações (`to_accessible_summary`): a data/hora agora é anunciada imediatamente após o texto do post (estilo: `Autor: texto, tanto tempo atrás`), atendendo à experiência fluida consagrada no TWBlue e solicitada pelo usuário.
+  - Adição da configuração `"time_position"` (`"after_text"` por padrão, com opção `"before_text"`) em `DEFAULT_CONFIG` e no gerenciador de preferências.
+  - Inclusão do controle de seleção "Posição da data e hora" na aba "Exibição e Leitura" da janela de Configurações (`SettingsDialog`), permitindo alternar entre após o post ou antes do post.
+  - Tratamento limpo para postagens sem texto (anúncio direto da data/hora e anexos de mídia sem vírgulas órfãs).
+
+### Testes
+- Atualização e expansão de `test_post_customizable_time_formats` em `tests/test_user_model.py` cobrindo a formatação padrão com tempo após o texto, modo alternativo antes do texto e cálculo de tempo relativo (ex.: `5 minutos atrás`).
+- Suíte completa de 48 testes unitários aprovada com 100% de sucesso.
+
+---
+
 ## [0.1.0-dev.22] - 2026-10-17
 
 ### Modificado

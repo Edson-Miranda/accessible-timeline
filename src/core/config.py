@@ -57,6 +57,7 @@ DEFAULT_CONFIG: Dict[str, Any] = {
     "speak_new_tweets": False,
     "author_display_format": "name_and_username",  # name_and_username, name_only, username_only, username_and_name
     "time_display_format": "relative",             # relative, absolute, both
+    "time_position": "after_text",                 # after_text, before_text
     "show_metrics_in_summary": True,
     "hide_to_tray_on_close": False,
     "global_hotkeys_enabled": True,
