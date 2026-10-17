@@ -311,13 +311,6 @@ class MainWindow(wx.Frame):
         panel = wx.Panel(self)
         main_sizer = wx.BoxSizer(wx.VERTICAL)
 
-        # Instrução acessível
-        self.info_label = wx.StaticText(
-            panel,
-            label="Árvore de contas e fluxos à esquerda (Tab para posts). Na lista de posts, Shift+Tab volta para a árvore. Atalho Ctrl+Win+Setas para alternar fluxos:"
-        )
-        main_sizer.Add(self.info_label, 0, wx.ALL, 6)
-
         # Painel horizontal dividindo Árvore (esquerda) e Lista (direita)
         content_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -326,6 +319,7 @@ class MainWindow(wx.Frame):
             panel,
             style=wx.TR_DEFAULT_STYLE | wx.TR_HAS_BUTTONS | wx.TR_LINES_AT_ROOT | wx.TR_SINGLE
         )
+        self.tree.SetName("Fluxos")
 
         # Criação dos nós da árvore
         self.account_root = self.tree.AddRoot("Conta X")
@@ -355,6 +349,7 @@ class MainWindow(wx.Frame):
             panel,
             style=wx.LC_REPORT | wx.LC_NO_HEADER | wx.LC_SINGLE_SEL
         )
+        self.list_ctrl.SetName("Publicações")
         self.list_ctrl.InsertColumn(0, "Publicações", width=1200)
         content_sizer.Add(self.list_ctrl, 3, wx.EXPAND)
 

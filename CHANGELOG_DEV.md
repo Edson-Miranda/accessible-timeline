@@ -1,3 +1,16 @@
+## [0.1.0-dev.22] - 2026-10-17
+
+### Modificado
+- **Otimização da Acessibilidade e Nomes de Controles na Janela Principal (`src/ui/main_window.py`)**:
+  - Remoção do texto estático prolixo (`self.info_label`) que precedia a árvore de navegação e fazia o leitor de tela (NVDA/JAWS) ler uma frase longa de instrução a cada foco ou interação na árvore.
+  - Definição de nomes acessíveis diretos e concisos para os controles principais da janela: `self.tree.SetName("Fluxos")` e `self.list_ctrl.SetName("Publicações")`.
+  - Leitura limpa e não obstrutiva pelo leitor de tela ao alternar entre a árvore de fluxos e a lista de publicações.
+
+### Testes
+- Validação completa da suíte de 48 testes unitários aprovados com 100% de sucesso.
+
+---
+
 ## [0.1.0-dev.21] - 2026-10-17
 
 ### Adicionado
