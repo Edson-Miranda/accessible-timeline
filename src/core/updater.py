@@ -7,10 +7,12 @@ import logging
 import os
 from pathlib import Path
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
 import urllib.request
+import zipfile
 from typing import Callable, Optional, Dict, Any
 from src.core.version import __version__, GITHUB_OWNER, GITHUB_REPO
 
@@ -148,46 +150,102 @@ def download_update_archive(
         return False
 
 
-def apply_update_and_restart(zip_path: str, target_dir: str, current_pid: int) -> bool:
+def extract_update_archive(
+    zip_path: str,
+    target_extract_dir: str,
+    progress_callback: Optional[Callable[[int, int], Optional[bool]]] = None
+) -> Optional[str]:
+    """
+    Extrai o arquivo de atualização compactado para target_extract_dir utilizando o módulo zipfile.
+    Se o pacote contiver uma pasta raiz única englobando os arquivos, retorna o caminho dessa subpasta;
+    caso contrário, retorna target_extract_dir.
+    Chama progress_callback(arquivos_extraidos, total_arquivos).
+    Se o callback retornar False, cancela a extração.
+    Retorna o caminho do diretório contendo os arquivos prontos, ou None em caso de falha.
+    """
+    os.makedirs(target_extract_dir, exist_ok=True)
+    try:
+        with zipfile.ZipFile(zip_path, "r") as zf:
+            members = zf.infolist()
+            total = len(members)
+            for i, member in enumerate(members, 1):
+                zf.extract(member, target_extract_dir)
+                if progress_callback and (i % 15 == 0 or i == total):
+                    should_continue = progress_callback(i, total)
+                    if should_continue is False:
+                        logger.info("Extração cancelada pelo usuário.")
+                        return None
+
+        # Se houver uma subpasta única na raiz contendo os arquivos (ex: AccessibleTimeline/AccessibleTimeline.exe)
+        entries = os.listdir(target_extract_dir)
+        if len(entries) == 1:
+            single_path = os.path.join(target_extract_dir, entries[0])
+            if os.path.isdir(single_path):
+                return single_path
+
+        return target_extract_dir
+    except Exception as e:
+        logger.error(f"Erro ao extrair pacote de atualização: {e}")
+        return None
+
+
+def apply_update_and_restart(
+    source_dir: str,
+    target_dir: str,
+    current_pid: int,
+    exe_name: str = "AccessibleTimeline.exe"
+) -> bool:
     """
     Cria e executa um script batch desacoplado que aguarda o encerramento do processo atual,
-    extrai o pacote ZIP na pasta da aplicação e reinicia o Accessible Timeline.
+    copia os arquivos já descompactados da pasta source_dir para target_dir (substituindo-os)
+    e reinicia o Accessible Timeline.
     """
     script_path = os.path.join(tempfile.gettempdir(), f"update_at_{current_pid}.bat")
+    exe_path = os.path.join(target_dir, exe_name)
 
     batch_content = f"""@echo off
 chcp 65001 >nul
-set PID={current_pid}
-set ZIP_PATH="{zip_path}"
-set TARGET_DIR="{target_dir}"
-set EXE_PATH="{os.path.join(target_dir, 'AccessibleTimeline.exe')}"
+set "PID={current_pid}"
+set "SOURCE_DIR={source_dir}"
+set "TARGET_DIR={target_dir}"
+set "EXE_PATH={exe_path}"
 
-:: Aguarda o processo principal encerrar
+:: Aguarda o processo principal encerrar (com timeout de até 15 segundos)
+set count=0
 :wait_loop
-tasklist /fi "PID eq %PID%" | findstr /i "%PID%" >nul
+tasklist /fi "PID eq %PID%" 2>nul | findstr /i "%PID%" >nul
 if not errorlevel 1 (
     timeout /t 1 /nobreak >nul
+    set /a count+=1
+    if %count% geq 15 (
+        taskkill /f /pid %PID% >nul 2>nul
+        goto wait_done
+    )
     goto wait_loop
 )
+:wait_done
 
-:: Aguarda liberar eventuais travas de DLLs e arquivos
+:: Aguarda 2 segundos para liberar todas as travas de DLLs e recursos em disco
 timeout /t 2 /nobreak >nul
 
-:: Extrai a atualizacao sobre a pasta de instalacao
-tar -xf %ZIP_PATH% -C %TARGET_DIR% 2>nul
-if errorlevel 1 (
-    powershell -NoProfile -Command "Expand-Archive -Path '%ZIP_PATH%' -DestinationPath '%TARGET_DIR%' -Force"
+:: Garante encerramento de qualquer processo residual do browser chromium
+taskkill /f /im chrome.exe /fi "WINDOWTITLE eq Accessible*" 2>nul
+
+:: Copia os arquivos já extraídos para a pasta de destino (robocopy nativo do Windows)
+robocopy "%SOURCE_DIR%" "%TARGET_DIR%" /E /IS /IT /R:5 /W:1 >nul
+if errorlevel 8 (
+    xcopy "%SOURCE_DIR%\\*" "%TARGET_DIR%\\" /E /Y /I /Q >nul
 )
 
-:: Remove o arquivo ZIP temporario
-del /f /q %ZIP_PATH% 2>nul
+:: Remove a pasta temporária de arquivos descompactados
+rmdir /s /q "%SOURCE_DIR%" 2>nul
 
-:: Reinicia a aplicacao atualizada se o executavel existir
-if exist %EXE_PATH% (
-    start "" %EXE_PATH%
+:: Reinicia a aplicação atualizada
+if exist "%EXE_PATH%" (
+    start "" "%EXE_PATH%"
 )
 
-:: Deleta este script de atualizacao
+:: Auto-exclusão deste script batch auxiliar
 (goto) 2>nul & del "%~f0"
 """
 

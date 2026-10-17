@@ -900,9 +900,9 @@ class MainWindow(wx.Frame):
         wx.MessageBox(info, f"Sobre o Accessible Timeline v{__version__}", wx.OK | wx.ICON_INFORMATION, self)
 
     def _check_updates_worker(self, silent: bool = False):
-        """Verifica se há uma nova versão disponível no GitHub Releases."""
+        """Verifica se há uma nova versão disponível."""
         if not silent:
-            self.status_bar.SetStatusText("Verificando se há atualizações disponíveis no GitHub...")
+            self.status_bar.SetStatusText("Verificando se há atualizações disponíveis...")
 
         def _worker():
             info = check_for_updates()
@@ -942,12 +942,12 @@ class MainWindow(wx.Frame):
             try:
                 res = dlg.ShowModal()
                 if res == wx.ID_OK:
-                    zip_path = dlg.get_zip_path()
-                    if zip_path and os.path.exists(zip_path):
+                    extracted_dir = dlg.get_extracted_dir()
+                    if extracted_dir and os.path.exists(extracted_dir):
                         target_dir = get_application_directory()
                         confirm_msg = (
-                            f"O download da versão {info.get('latest_version')} foi concluído com sucesso!\n\n"
-                            f"O aplicativo será reiniciado para extrair e aplicar os arquivos na pasta de instalação:\n"
+                            f"A nova versão ({info.get('latest_version')}) foi baixada e preparada com sucesso!\n\n"
+                            f"O aplicativo será reiniciado para aplicar os arquivos atualizados na pasta de instalação:\n"
                             f"{target_dir}\n\n"
                             f"Deseja fechar o Accessible Timeline e atualizar agora?"
                         )
@@ -958,16 +958,17 @@ class MainWindow(wx.Frame):
                             self
                         )
                         if restart_res == wx.YES:
-                            self.status_bar.SetStatusText("Aplicando atualização e reiniciando...")
+                            self.set_status_message("Aplicando atualização e reiniciando...", speak=True)
+                            self._is_exiting = True
                             current_pid = os.getpid()
-                            success = apply_update_and_restart(zip_path, target_dir, current_pid)
+                            success = apply_update_and_restart(extracted_dir, target_dir, current_pid)
                             if success:
                                 self.Close(True)
                                 return
                             else:
                                 wx.MessageBox(
                                     "Não foi possível iniciar o assistente de atualização automática.\n"
-                                    "Você pode extrair o arquivo compactado manualmente se desejar.",
+                                    "Você pode aplicar os arquivos da atualização manualmente se desejar.",
                                     "Erro ao Aplicar",
                                     wx.OK | wx.ICON_ERROR,
                                     self

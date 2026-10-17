@@ -1,3 +1,24 @@
+## [0.1.0-dev.24] - 2026-10-17
+
+### Corrigido
+- **Correção da Extração e Aplicação de Atualizações In-Place no Estilo TWBlue (`src/core/updater.py`, `src/ui/dialogs.py`, `src/ui/main_window.py`)**:
+  - Implementação de extração direta em Python via `extract_update_archive` utilizando o módulo nativo `zipfile`, eliminando as falhas de extração em lote no cmd/powershell decorrentes de formatação de aspas, letras de unidade (`DriveNotFoundException`) ou dependência de `tar`.
+  - Transição contínua na interface gráfica (`UpdateDownloadDialog`): ao término do download, a caixa de diálogo inicia a extração em segundo plano com atualização em tempo real de contagem e porcentagem de arquivos processados no `wx.Gauge` e nos rótulos acessíveis para leitores de tela.
+  - Otimização do script batch desacoplado (`apply_update_and_restart`): recebe o diretório já descompactado (`source_dir`), utiliza sintaxe segura de variáveis `set "VAR=..."`, aguarda o encerramento do processo com timeout inteligente, encerra instâncias residuais de navegadores, realiza a cópia atômica com `robocopy` multi-tentativa (com fallback para `xcopy`) e reinicia o aplicativo atualizado.
+  - Remoção imediata do arquivo ZIP compactado após a extração bem-sucedida, economizando espaço em disco temporário.
+
+### Modificado
+- **Simplificação e Limpeza de Mensagens para Usuários e Leitores de Tela (`src/ui/dialogs.py`, `src/ui/main_window.py`, `CHANGELOG.html`)**:
+  - Substituição da mensagem "Conectando aos servidores do GitHub..." no diálogo de download pelo texto direto e conciso "Baixando atualização...", conforme solicitado pelo usuário.
+  - Atualização do status na janela principal para "Verificando se há atualizações disponíveis...".
+  - Remoção de todas as referências técnicas de Git, GitHub e termos de repositório no `CHANGELOG.html` (seções PT-BR e EN-US), substituindo por termos amigáveis voltados ao usuário final.
+
+### Testes
+- Adição de testes unitários em `tests/test_updater.py` cobrindo a extração bem-sucedida via `extract_update_archive`, suporte a subpastas raiz, cancelamento de extração e geração do script de atualização com `robocopy`.
+- Suíte completa de 51 testes unitários aprovada com 100% de sucesso.
+
+---
+
 ## [0.1.0-dev.23] - 2026-10-17
 
 ### Modificado

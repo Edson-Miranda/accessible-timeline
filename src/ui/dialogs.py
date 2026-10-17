@@ -1329,7 +1329,7 @@ class UpdateDownloadDialog(wx.Dialog):
 
         self.progress_label = wx.StaticText(
             panel,
-            label="Conectando aos servidores do GitHub..."
+            label="Baixando atualização..."
         )
         sizer.Add(self.progress_label, 0, wx.ALL, 12)
 
@@ -1344,9 +1344,12 @@ class UpdateDownloadDialog(wx.Dialog):
         self.Bind(wx.EVT_CHAR_HOOK, self._on_char_hook)
 
     def _start_download(self):
-        from src.core.updater import download_update_archive
+        from src.core.updater import download_update_archive, extract_update_archive
+        import shutil
 
         self._target_zip = os.path.join(tempfile.gettempdir(), f"AccessibleTimeline_v{self.new_version}.zip")
+        self._temp_extract_root = tempfile.mkdtemp(prefix=f"at_update_v{self.new_version}_")
+        self._extracted_dir = None
 
         def _on_progress(downloaded: int, total: int):
             if self._cancelled:
@@ -1369,19 +1372,73 @@ class UpdateDownloadDialog(wx.Dialog):
             return True
 
         def _worker():
-            success = download_update_archive(self.download_url, self._target_zip, progress_callback=_on_progress)
-            self._download_success = success
+            dl_success = download_update_archive(self.download_url, self._target_zip, progress_callback=_on_progress)
+            if self._cancelled or not dl_success:
+                def _on_dl_fail():
+                    if not self._cancelled:
+                        wx.MessageBox(
+                            "Falha ao realizar o download da atualização.\nVerifique sua conexão de rede ou tente novamente.",
+                            "Erro no Download",
+                            wx.OK | wx.ICON_ERROR,
+                            self
+                        )
+                    self.EndModal(wx.ID_CANCEL)
+                wx.CallAfter(_on_dl_fail)
+                return
+
+            # Download concluído com sucesso: extração segura em Python
+            def _prep_extract_ui():
+                if self._cancelled or not self:
+                    return
+                self.gauge.SetValue(0)
+                self.status_label.SetLabel("Extraindo arquivos da atualização. Por favor, aguarde...")
+                self.progress_label.SetLabel("Extraindo componentes...")
+                self.SetTitle(f"Extraindo Atualização v{self.new_version}...")
+            wx.CallAfter(_prep_extract_ui)
+
+            def _on_extract_progress(current: int, total: int):
+                if self._cancelled:
+                    return False
+                pct = int((current / total) * 100) if total > 0 else 0
+                def _update_extract_ui():
+                    if self._cancelled or not self:
+                        return
+                    self.gauge.SetValue(min(pct, 100))
+                    self.progress_label.SetLabel(f"Extraindo: {current} de {total} arquivos ({pct}%)")
+                wx.CallAfter(_update_extract_ui)
+                return True
+
+            extracted_path = extract_update_archive(
+                self._target_zip,
+                self._temp_extract_root,
+                progress_callback=_on_extract_progress
+            )
+
+            # Limpa o arquivo compactado após a extração
+            if os.path.exists(self._target_zip):
+                try:
+                    os.remove(self._target_zip)
+                except Exception:
+                    pass
 
             def _finish():
                 if self._cancelled:
+                    if os.path.exists(self._temp_extract_root):
+                        shutil.rmtree(self._temp_extract_root, ignore_errors=True)
                     self.EndModal(wx.ID_CANCEL)
                     return
-                if success:
+
+                if extracted_path and os.path.exists(extracted_path):
+                    self._extracted_dir = extracted_path
+                    self._download_success = True
                     self.EndModal(wx.ID_OK)
                 else:
+                    if os.path.exists(self._temp_extract_root):
+                        shutil.rmtree(self._temp_extract_root, ignore_errors=True)
                     wx.MessageBox(
-                        "Falha ao realizar o download da atualização.\nVerifique sua conexão de rede ou tente novamente.",
-                        "Erro no Download",
+                        "Erro ao extrair os arquivos da atualização.\n"
+                        "O arquivo pode estar corrompido ou o espaço em disco é insuficiente.",
+                        "Erro na Atualização",
                         wx.OK | wx.ICON_ERROR,
                         self
                     )
@@ -1401,6 +1458,9 @@ class UpdateDownloadDialog(wx.Dialog):
             self._on_cancel(event)
         else:
             event.Skip()
+
+    def get_extracted_dir(self) -> Optional[str]:
+        return self._extracted_dir if self._download_success else None
 
     def get_zip_path(self) -> Optional[str]:
         return self._target_zip if self._download_success else None

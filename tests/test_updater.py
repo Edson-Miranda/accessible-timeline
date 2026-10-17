@@ -7,8 +7,10 @@ from src.core.updater import (
     parse_version_tuple,
     get_application_directory,
     download_update_archive,
+    extract_update_archive,
     apply_update_and_restart,
 )
+import zipfile
 
 
 class TestUpdater(unittest.TestCase):
@@ -78,17 +80,60 @@ class TestUpdater(unittest.TestCase):
                 self.assertFalse(os.path.exists(target_file))
                 self.assertFalse(os.path.exists(target_file + ".part"))
 
+    def test_extract_update_archive_success(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            zip_path = os.path.join(tmp_dir, "test.zip")
+            with zipfile.ZipFile(zip_path, "w") as zf:
+                zf.writestr("AccessibleTimeline.exe", b"fake_binary")
+                zf.writestr("sub/nested.txt", b"nested_data")
+
+            extract_dest = os.path.join(tmp_dir, "extracted")
+            progress_calls = []
+
+            def _cb(cur, tot):
+                progress_calls.append((cur, tot))
+                return True
+
+            res_path = extract_update_archive(zip_path, extract_dest, progress_callback=_cb)
+            self.assertIsNotNone(res_path)
+            self.assertTrue(os.path.exists(os.path.join(extract_dest, "AccessibleTimeline.exe")))
+            self.assertTrue(os.path.exists(os.path.join(extract_dest, "sub", "nested.txt")))
+            self.assertGreater(len(progress_calls), 0)
+
+    def test_extract_update_archive_single_root_folder(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            zip_path = os.path.join(tmp_dir, "test_root.zip")
+            with zipfile.ZipFile(zip_path, "w") as zf:
+                zf.writestr("AccessibleTimeline-v0.4.0/AccessibleTimeline.exe", b"binary")
+
+            extract_dest = os.path.join(tmp_dir, "extracted")
+            res_path = extract_update_archive(zip_path, extract_dest)
+            self.assertEqual(res_path, os.path.join(extract_dest, "AccessibleTimeline-v0.4.0"))
+            self.assertTrue(os.path.exists(os.path.join(res_path, "AccessibleTimeline.exe")))
+
+    def test_extract_update_archive_cancellation(self):
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            zip_path = os.path.join(tmp_dir, "test_cancel.zip")
+            with zipfile.ZipFile(zip_path, "w") as zf:
+                zf.writestr("file1.txt", b"data")
+                zf.writestr("file2.txt", b"data2")
+
+            extract_dest = os.path.join(tmp_dir, "extracted")
+            res_path = extract_update_archive(zip_path, extract_dest, progress_callback=lambda c, t: False)
+            self.assertIsNone(res_path)
+
     def test_apply_update_and_restart_generates_batch_script(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
-            zip_path = os.path.join(tmp_dir, "fake_update.zip")
-            with open(zip_path, "wb") as f:
-                f.write(b"PK00")
+            source_dir = os.path.join(tmp_dir, "extracted_source")
+            os.makedirs(source_dir, exist_ok=True)
+            with open(os.path.join(source_dir, "AccessibleTimeline.exe"), "wb") as f:
+                f.write(b"EXE")
 
             target_dir = os.path.join(tmp_dir, "app_dir")
             os.makedirs(target_dir, exist_ok=True)
 
             with patch("subprocess.Popen") as mock_popen:
-                success = apply_update_and_restart(zip_path, target_dir, current_pid=12345)
+                success = apply_update_and_restart(source_dir, target_dir, current_pid=12345)
                 self.assertTrue(success)
                 self.assertTrue(mock_popen.called)
 
@@ -98,9 +143,10 @@ class TestUpdater(unittest.TestCase):
                 with open(expected_script, "r", encoding="utf-8") as f:
                     content = f.read()
                     self.assertIn("12345", content)
-                    self.assertIn(zip_path, content)
+                    self.assertIn(source_dir, content)
                     self.assertIn(target_dir, content)
                     self.assertIn("AccessibleTimeline.exe", content)
+                    self.assertIn("robocopy", content)
 
                 # Limpa o arquivo temporário gerado no teste
                 try:
