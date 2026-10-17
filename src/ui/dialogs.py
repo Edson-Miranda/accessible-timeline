@@ -1188,10 +1188,17 @@ class SearchUsersDialog(wx.Dialog):
     def _on_view_timeline(self, event):
         u = self._get_selected_user()
         if u:
-            dlg = UserTimelineDialog(self, u.username, self.executor)
-            dlg.ShowModal()
-            dlg.Destroy()
-            self.results_list.SetFocus()
+            parent = self.GetParent()
+            if hasattr(parent, "open_user_timeline_buffer"):
+                self.EndModal(wx.ID_OK)
+                wx.CallAfter(parent.open_user_timeline_buffer, u.username)
+            else:
+                dlg = UserTimelineDialog(self, self.executor, u.username)
+                try:
+                    dlg.ShowModal()
+                finally:
+                    dlg.Destroy()
+                self.results_list.SetFocus()
 
     def _on_toggle_follow(self, event):
         u = self._get_selected_user()

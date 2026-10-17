@@ -109,6 +109,7 @@ class XBrowserManager:
         self._my_username: Optional[str] = None
         self._force_visible = False
         self._current_headless: Optional[bool] = None
+        self._current_feed: str = "for_you"
 
         self.on_posts_callback: Optional[Callable[[str, list[Post]], None]] = None
         self.on_status_callback: Optional[Callable[[str], None]] = None
@@ -635,7 +636,16 @@ class XBrowserManager:
 
     def _click_tab_by_name(self, page: Page, feed_name: str) -> bool:
         """Clica na aba especificada usando locators nativos do Playwright com fallback JS."""
-        if feed_name == "sent":
+        if feed_name.startswith("user:"):
+            clean_u = feed_name[5:].lstrip("@").strip()
+            target_url = f"https://x.com/{clean_u}"
+            try:
+                page.goto(target_url, wait_until="domcontentloaded", timeout=25000)
+                return True
+            except Exception as e:
+                logger.warning(f"Erro ao navegar para perfil de @{clean_u}: {e}")
+                return False
+        elif feed_name == "sent":
             target_url = f"https://x.com/{self._my_username}" if self._my_username else "https://x.com/home"
             try:
                 page.goto(target_url, wait_until="domcontentloaded", timeout=25000)
@@ -764,6 +774,8 @@ class XBrowserManager:
                             feed_type = "mentions"
                         elif "dm" in url or "messages" in url:
                             feed_type = "dms"
+                        elif self._current_feed.startswith("user:"):
+                            feed_type = self._current_feed
                         elif "UserTweets" in url or (self._my_username and f"/{self._my_username}" in url):
                             feed_type = "sent"
                         else:
@@ -958,6 +970,7 @@ class XBrowserManager:
                                 break
                             elif cmd == "switch_tab":
                                 feed_name = arg
+                                self._current_feed = feed_name
                                 self._set_status(f"Acessando fluxo {feed_name}...")
                                 self._click_tab_by_name(page, feed_name)
                                 self._detect_account_info(page)

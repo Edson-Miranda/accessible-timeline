@@ -65,11 +65,22 @@ class TestUserModelAndFormatting(unittest.TestCase):
 
     def test_default_shortcuts_dictionaries(self):
         self.assertIn("new_post", DEFAULT_SHORTCUTS)
+        self.assertIn("close_buffer", DEFAULT_SHORTCUTS)
+        self.assertIn("author_timeline", DEFAULT_SHORTCUTS)
         self.assertIn("toggle_visibility", DEFAULT_GLOBAL_SHORTCUTS)
         self.assertIn("next_post", DEFAULT_GLOBAL_SHORTCUTS)
         self.assertIn("prev_post", DEFAULT_GLOBAL_SHORTCUTS)
         self.assertIn("next_stream", DEFAULT_GLOBAL_SHORTCUTS)
         self.assertIn("prev_stream", DEFAULT_GLOBAL_SHORTCUTS)
+
+    def test_stream_display_name_for_user_buffer(self):
+        from unittest.mock import MagicMock
+        from src.ui.main_window import MainWindow
+        # Mock para evitar criar UI completa
+        mw = MainWindow.__new__(MainWindow)
+        name = mw._get_stream_display_name("user:elonmusk")
+        self.assertEqual(name, "Timeline @elonmusk")
+        self.assertEqual(mw._get_stream_display_name("for_you"), "Para você")
 
 
 if __name__ == "__main__":

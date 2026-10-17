@@ -21,6 +21,8 @@ DEFAULT_SHORTCUTS: Dict[str, str] = {
     "like": "Ctrl+L",
     "send_dm": "Ctrl+D",
     "user_timeline": "Ctrl+U",
+    "close_buffer": "Ctrl+W",
+    "author_timeline": "Ctrl+Alt+U",
     "search_users": "Ctrl+Shift+U",
     "follow": "Ctrl+Shift+F",
     "unfollow": "Ctrl+Alt+F",

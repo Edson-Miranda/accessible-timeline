@@ -221,7 +221,8 @@ class MainWindow(wx.Frame):
         item_refresh = timeline_menu.Append(wx.ID_REFRESH, "&Atualizar Fluxo Ativo\tF5", "Recarrega o fluxo selecionado na árvore")
         item_load_more = timeline_menu.Append(wx.ID_ANY, "Carregar &Mais Postagens\tCtrl+M", "Solicita rolagem no navegador para mais postagens")
         timeline_menu.AppendSeparator()
-        item_user_timeline = timeline_menu.Append(wx.ID_ANY, "Abrir &Linha do Tempo de Usuário...\tCtrl+U", "Abre as postagens de um usuário específico do X")
+        item_user_timeline = timeline_menu.Append(wx.ID_ANY, "Abrir &Linha do Tempo de Usuário em Novo Buffer...\tCtrl+U", "Abre as postagens de um usuário específico em um novo buffer na árvore")
+        item_close_buffer = timeline_menu.Append(wx.ID_ANY, "&Fechar Fluxo / Buffer Ativo\tCtrl+W", "Fecha o buffer personalizado ativo na árvore")
         timeline_menu.AppendSeparator()
         item_details = timeline_menu.Append(wx.ID_ANY, "Ver &Detalhes da Publicação\tEnter", "Abre os detalhes da postagem selecionada")
         item_open_link = timeline_menu.Append(wx.ID_ANY, "Abrir &Link no Navegador\tCtrl+Enter", "Abre o link da postagem selecionada no navegador padrão")
@@ -243,6 +244,7 @@ class MainWindow(wx.Frame):
         item_dm = actions_menu.Append(wx.ID_ANY, "Enviar &Mensagem Direta (DM)...\tCtrl+D", "Envia uma mensagem direta para o autor da publicação")
         actions_menu.AppendSeparator()
         item_search_users = actions_menu.Append(wx.ID_ANY, "Buscar &Usuários...\tCtrl+Shift+U", "Pesquisa usuários no X e permite ver perfil e timeline")
+        item_author_timeline = actions_menu.Append(wx.ID_ANY, "Abrir Linha do Tempo do &Autor em Novo Buffer\tCtrl+Alt+U", "Abre a timeline do autor da publicação selecionada em um novo buffer")
         item_follow = actions_menu.Append(wx.ID_ANY, "Se&guir Autor\tCtrl+Shift+F", "Começa a seguir o autor da publicação selecionada")
         item_unfollow = actions_menu.Append(wx.ID_ANY, "&Deixar de Seguir Autor\tCtrl+Alt+F", "Deixa de seguir o autor da publicação selecionada")
         item_block = actions_menu.Append(wx.ID_ANY, "&Bloquear Autor\tCtrl+Shift+B", "Bloqueia o autor da publicação selecionada")
@@ -283,6 +285,7 @@ class MainWindow(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_refresh, item_refresh)
         self.Bind(wx.EVT_MENU, self._on_load_more, item_load_more)
         self.Bind(wx.EVT_MENU, self._on_open_user_timeline, item_user_timeline)
+        self.Bind(wx.EVT_MENU, lambda e: self.close_active_buffer(), item_close_buffer)
         self.Bind(wx.EVT_MENU, self._on_open_details, item_details)
         self.Bind(wx.EVT_MENU, self._on_open_link, item_open_link)
         self.Bind(wx.EVT_MENU, self._on_toggle_browser, item_toggle_browser)
@@ -293,6 +296,7 @@ class MainWindow(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_toggle_like, item_like)
         self.Bind(wx.EVT_MENU, self._on_send_dm, item_dm)
         self.Bind(wx.EVT_MENU, self._on_search_users, item_search_users)
+        self.Bind(wx.EVT_MENU, self._on_open_author_timeline, item_author_timeline)
         self.Bind(wx.EVT_MENU, self._on_follow_author, item_follow)
         self.Bind(wx.EVT_MENU, self._on_unfollow_author, item_unfollow)
         self.Bind(wx.EVT_MENU, self._on_block_author, item_block)
@@ -301,6 +305,7 @@ class MainWindow(wx.Frame):
         self.Bind(wx.EVT_MENU, self._on_check_updates, item_check_updates)
         self.Bind(wx.EVT_MENU, self._on_about, item_about)
         self.Bind(wx.EVT_MENU, lambda e: self._real_exit(), item_exit)
+
 
     def _init_ui(self):
         panel = wx.Panel(self)
@@ -420,6 +425,8 @@ class MainWindow(wx.Frame):
             self.reader.switch_feed_tab(stream_id)
 
     def _get_stream_display_name(self, stream_id: str) -> str:
+        if stream_id.startswith("user:"):
+            return f"Timeline @{stream_id[5:]}"
         names = {
             "for_you": "Para você",
             "following": "Seguindo",
@@ -466,13 +473,23 @@ class MainWindow(wx.Frame):
             self._cycle_stream(forward=not shift)
             return
 
-        # Atalhos de Usuários (TWBlue):
+        # Atalhos de Usuários e Buffers (TWBlue):
+        # Ctrl + W: Fechar Fluxo / Buffer Ativo
+        if ctrl and not shift and not win and not alt and key in (ord('W'), ord('w')):
+            self.close_active_buffer()
+            return
+
         # Ctrl + Shift + U: Buscar Usuários
         if ctrl and shift and not win and not alt and key in (ord('U'), ord('u')):
             self._on_search_users(None)
             return
 
-        # Ctrl + U: Abrir Linha do Tempo de Usuário
+        # Ctrl + Alt + U: Abrir Linha do Tempo do Autor da postagem em novo buffer
+        if ctrl and alt and not win and not shift and key in (ord('U'), ord('u')):
+            self._on_open_author_timeline(None)
+            return
+
+        # Ctrl + U: Abrir Linha do Tempo de Usuário em novo buffer
         if ctrl and not shift and not win and not alt and key in (ord('U'), ord('u')):
             self._on_open_user_timeline(None)
             return
@@ -829,8 +846,21 @@ class MainWindow(wx.Frame):
 
     def _on_refresh(self, event):
         label = self._get_stream_display_name(self._active_stream)
-        self.status_bar.SetStatusText(f"Solicitando atualização de {label} no navegador...")
-        self.reader.refresh(self._active_stream)
+        self.status_bar.SetStatusText(f"Solicitando atualização de {label}...")
+        if self._active_stream.startswith("user:"):
+            clean_user = self._active_stream[5:]
+            def _fetch():
+                posts = self.executor.fetch_user_timeline(clean_user)
+                def _update_ui():
+                    store = self.stores.get(self._active_stream)
+                    if store:
+                        store.add_posts(posts)
+                        self.set_status_message(f"Pronto. {len(posts)} publicações atualizadas em Timeline @{clean_user}.")
+                        sound_manager.play_tweet_received()
+                wx.CallAfter(_update_ui)
+            threading.Thread(target=_fetch, daemon=True, name=f"RefreshTimeline_{clean_user}").start()
+        else:
+            self.reader.refresh(self._active_stream)
 
     def _on_load_more(self, event):
         self.status_bar.SetStatusText("Carregando mais postagens...")
@@ -1103,29 +1133,114 @@ class MainWindow(wx.Frame):
             dlg.Destroy()
         self.list_ctrl.SetFocus()
 
+    def open_user_timeline_buffer(self, username: str):
+        """Cria ou alterna para um buffer exclusivo da linha do tempo do usuário na árvore."""
+        clean_user = username.strip().lstrip("@")
+        if not clean_user:
+            return
+
+        stream_id = f"user:{clean_user.lower()}"
+
+        # Se o buffer já existir na árvore, apenas alterna para ele
+        if stream_id in self.stores:
+            self._switch_to_stream(stream_id, notify_browser=True)
+            self.set_status_message(f"Alternado para a linha do tempo de @{clean_user}.")
+            speech_manager.speak(f"Linha do tempo de @{clean_user} selecionada.", interrupt=True)
+            wx.CallAfter(self.list_ctrl.SetFocus)
+            return
+
+        # Cria novo store em memória e inscreve os eventos da lista
+        store = TimelineStore()
+        self.stores[stream_id] = store
+        store.subscribe(self._create_store_callback(stream_id))
+
+        # Adiciona o nó do usuário na árvore nativa Win32
+        tree_item = self.tree.AppendItem(self.account_root, f"Timeline @{clean_user}")
+        self._item_to_stream[tree_item] = stream_id
+        self._stream_to_item[stream_id] = tree_item
+        self._stream_order.append(stream_id)
+
+        # Alterna para o novo fluxo
+        self._switch_to_stream(stream_id, notify_browser=True)
+        self.set_status_message(f"Abrindo buffer e carregando linha do tempo de @{clean_user}...")
+        speech_manager.speak(f"Buffer da linha do tempo de @{clean_user} criado. Carregando publicações...", interrupt=True)
+
+        # Carrega as publicações de forma assíncrona
+        def _fetch():
+            posts = self.executor.fetch_user_timeline(clean_user)
+            def _update_ui():
+                if posts:
+                    store.add_posts(posts)
+                    self.set_status_message(f"Pronto. {len(posts)} publicações carregadas em Timeline @{clean_user}.")
+                    sound_manager.play_tweet_received()
+                else:
+                    self.set_status_message(f"Nenhuma publicação recente encontrada para @{clean_user}.")
+            wx.CallAfter(_update_ui)
+
+        threading.Thread(target=_fetch, daemon=True, name=f"FetchTimeline_{clean_user}").start()
+        wx.CallAfter(self.list_ctrl.SetFocus)
+
+    def close_active_buffer(self):
+        """Fecha o buffer personalizado ativo na árvore (ex.: linha do tempo de usuário)."""
+        if not self._active_stream.startswith("user:"):
+            msg = "Os fluxos padrão do sistema (Para você, Seguindo, Menções, DMs, Enviados) não podem ser fechados."
+            self.set_status_message(msg)
+            speech_manager.speak(msg, interrupt=True)
+            wx.Bell()
+            return
+
+        stream_id = self._active_stream
+        clean_user = stream_id[5:]
+
+        # Remove o store e desassocia da árvore
+        self.stores.pop(stream_id, None)
+        tree_item = self._stream_to_item.pop(stream_id, None)
+        if tree_item:
+            self._item_to_stream.pop(tree_item, None)
+            try:
+                self.tree.DeleteItem(tree_item)
+            except Exception:
+                pass
+
+        if stream_id in self._stream_order:
+            self._stream_order.remove(stream_id)
+
+        # Retorna para o fluxo principal
+        fallback = self._stream_order[0] if self._stream_order else "for_you"
+        self._switch_to_stream(fallback, notify_browser=True)
+        msg = f"Buffer de @{clean_user} fechado. Alternado para {self._get_stream_display_name(fallback)}."
+        self.set_status_message(f"Buffer de @{clean_user} fechado com sucesso.")
+        speech_manager.speak(msg, interrupt=True)
+        wx.CallAfter(self.list_ctrl.SetFocus)
+
     def _on_open_user_timeline(self, event=None):
-        """Abre diálogo para informar @usuário e exibir sua linha do tempo."""
+        """Abre diálogo para informar @usuário e criar novo buffer na árvore."""
         store = self.stores.get(self._active_stream)
         post = store.get_current_post() if store else None
         initial_user = post.author_username if post else ""
         dlg = wx.TextEntryDialog(
             self,
-            "Digite o @nome_de_usuario (sem o @) para abrir a linha do tempo:",
-            "Abrir Linha do Tempo de Usuário",
+            "Digite o @nome_de_usuario (sem o @) para abrir como novo buffer na árvore:",
+            "Abrir Linha do Tempo em Novo Buffer",
             value=initial_user
         )
         if dlg.ShowModal() == wx.ID_OK:
             username = dlg.GetValue().strip().lstrip("@")
             dlg.Destroy()
             if username:
-                timeline_dlg = UserTimelineDialog(self, self.executor, username)
-                try:
-                    timeline_dlg.ShowModal()
-                finally:
-                    timeline_dlg.Destroy()
-                self.list_ctrl.SetFocus()
+                self.open_user_timeline_buffer(username)
         else:
             dlg.Destroy()
+
+    def _on_open_author_timeline(self, event=None):
+        """Abre a linha do tempo do autor da publicação selecionada em um novo buffer."""
+        store = self.stores.get(self._active_stream)
+        post = store.get_current_post() if store else None
+        if not post:
+            self.set_status_message("Nenhuma publicação selecionada.")
+            wx.Bell()
+            return
+        self.open_user_timeline_buffer(post.author_username)
 
     def _on_follow_author(self, event=None):
         """Começa a seguir o autor da publicação selecionada."""

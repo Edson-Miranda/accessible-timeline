@@ -1,3 +1,23 @@
+## [0.1.0-dev.21] - 2026-10-17
+
+### Adicionado
+- **Buffers Dinâmicos para Linhas do Tempo de Usuários (`src/ui/main_window.py`, `src/platforms/x_twitter/browser.py`, `src/ui/app.py`, `src/ui/dialogs.py`)**:
+  - Implementação de `open_user_timeline_buffer` permitindo que ao abrir a timeline de qualquer perfil do X (via `Ctrl+U`, `Ctrl+Alt+U` ou através da busca de usuários), um novo nó persistente seja criado na árvore de contas (`self.tree`).
+  - Criação de store dedicado em memória (`TimelineStore`) para cada usuário aberto (`user:username`), com sincronização de postagens, navegação e leitura acessível por teclado na lista de publicações.
+  - Carregamento assíncrono das publicações do perfil no navegador Chromium com anúncios vocais do progresso via leitor de tela e reprodução sonora.
+  - Implementação do método `close_active_buffer` e atalho `Ctrl+W` para fechar o buffer de usuário ativo na árvore e retornar suavemente para o fluxo principal, mantendo a integridade dos buffers essenciais do sistema.
+  - Adição do atalho `Ctrl+Alt+U` para abrir imediatamente a linha do tempo do autor da publicação selecionada em um novo buffer.
+  - Suporte a atualização com `F5` e rolagem com `Ctrl+M` para buffers dinâmicos de usuários.
+- **Roteamento Passivo de Redes para Buffers Dinâmicos (`src/platforms/x_twitter/browser.py`, `src/ui/app.py`)**:
+  - Rastreamento do feed ativo em `XBrowserManager` (`self._current_feed`) e roteamento direcionado de respostas GraphQL de perfis para o respectivo store de usuário ativo.
+  - Integração no `SearchUsersDialog`: ao selecionar um perfil e ativar "Ver Linha do Tempo", o diálogo fecha e abre imediatamente o novo buffer na janela principal.
+
+### Testes
+- Adicionados testes unitários em `tests/test_user_model.py` cobrindo formatação de títulos de buffers de usuários e presença dos atalhos `close_buffer` e `author_timeline`.
+- Suíte expandida para 48 testes unitários aprovados com 100% de sucesso.
+
+---
+
 ## [0.1.0-dev.20] - 2026-10-17
 
 ### Adicionado

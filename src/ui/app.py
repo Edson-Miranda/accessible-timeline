@@ -57,6 +57,8 @@ class AccessibleTimelineApp(wx.App):
                 target = "dms"
             elif target == "sent":
                 target = "sent"
+            elif target.startswith("user:"):
+                target = target
             elif target != "following":
                 target = "for_you"
 
